@@ -3,5 +3,18 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",
     "source.sortMembers": "explicit"
-  }
+  },
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+  "tailwindCSS.includeLanguages": {
+    "javascript": "javascript",
+    "html": "HTML"
+  },
+  "editor.quickSuggestions": {
+    "strings": true
+  },
+  "tailwindCSS.experimental.classRegex": [
+    "className[\"'`]([^\"'`]*).*?[\"'`]"
+  ]
 }
