@@ -38,7 +38,7 @@ export default Sentry.wrap(function RootLayout() {
     if (error) throw error;
 
     if (fontsLoaded) {
-      SplashScreen.hideAsync();
+      SplashScreen.hide();
     }
   }, [fontsLoaded, error]);
 

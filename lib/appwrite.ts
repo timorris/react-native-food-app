@@ -1,4 +1,4 @@
-import { CreateUserParams, GetMenuParams, SignInParams } from "@/type";
+import { CreateUserParams, GetItemParams, GetMenuParams, SignInParams } from "@/type";
 import { Account, Client, Databases, ID, Query, Storage } from "react-native-appwrite";
 
 export const config = {
@@ -105,8 +105,6 @@ export const getCurrentUser = async () => {
     try {
         const currentAccount = await account.get();
 
-				console.log('currentAccount: ', currentAccount);
-
         if(!currentAccount) throw Error;
 
         const currentUser = await databases.listDocuments(
@@ -138,6 +136,21 @@ export const getMenu = async ({ category, query }: GetMenuParams) => {
         )
 
         return menus.documents;
+    } catch (e) {
+        throw new Error(e as string);
+    }
+}
+
+export const getItem = async ({ name }: GetItemParams) => {
+    try {
+
+        const items = await databases.listDocuments(
+            config.databaseId,
+            config.menuCollectionId,
+            [Query.equal('name', name)]
+        );
+
+        return items.documents[0];
     } catch (e) {
         throw new Error(e as string);
     }

@@ -105,3 +105,7 @@ interface GetMenuParams {
     category: string;
     query: string;
 }
+
+interface GetItemParams {
+    name: string;
+}
