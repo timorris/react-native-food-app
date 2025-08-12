@@ -34,6 +34,7 @@ const SignUp = () => {
       }
 
 			await createUser({ email, password, name });
+
 			router.replace('/');
 		}
 		catch (error: any) {
