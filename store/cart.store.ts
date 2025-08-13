@@ -18,6 +18,8 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
     addItem: (item) => {
         const customizations = item.customizations ?? [];
+        // Round the price to 2 decimal places to avoid floating-point precision issues
+        const roundedPrice = Math.round(item.price * 100) / 100;
 
         const existing = get().items.find(
             (i) =>
@@ -36,7 +38,7 @@ export const useCartStore = create<CartStore>((set, get) => ({
             });
         } else {
             set({
-                items: [...get().items, { ...item, quantity: 1, customizations }],
+                items: [...get().items, { ...item, price: roundedPrice, quantity: 1, customizations }],
             });
         }
     },
@@ -82,14 +84,11 @@ export const useCartStore = create<CartStore>((set, get) => ({
     getTotalItems: () =>
         get().items.reduce((total, item) => total + item.quantity, 0),
 
-    getTotalPrice: () =>
-        get().items.reduce((total, item) => {
-            const base = item.price;
-            const customPrice =
-                item.customizations?.reduce(
-                    (s: number, c: CartCustomization) => s + c.price,
-                    0
-                ) ?? 0;
-            return total + item.quantity * (base + customPrice);
-        }, 0),
+    getTotalPrice: () => {
+        const total = get().items.reduce((total, item) => {
+            return total + item.quantity * item.price;
+        }, 0);
+        // Round the total to 2 decimal places to avoid floating-point precision issues
+        return Math.round(total * 100) / 100;
+    },
 }));
