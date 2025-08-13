@@ -23,13 +23,30 @@ interface CustomizationItem {
 const ItemDetails = () => {
   const router = useRouter();
   const { item } = useLocalSearchParams<{ item: string }>();
-  const { addItem } = useCartStore();
+  const { addItem, updateItem } = useCartStore();
   
   // Parse the item data from the route params
-  const itemData: MenuItem = item ? JSON.parse(decodeURIComponent(item)) : null;
+  const parsedData = item ? JSON.parse(decodeURIComponent(item)) : null;
+  const isEditMode = parsedData?.isEditMode || false;
+  const itemData: MenuItem = isEditMode ? parsedData.menuItem : parsedData;
+  const cartItem = isEditMode ? parsedData.cartItem : null;
   
-  const [selectedToppings, setSelectedToppings] = useState<string[]>([]);
-  const [selectedSides, setSelectedSides] = useState<string[]>([]);
+  const [selectedToppings, setSelectedToppings] = useState<string[]>(() => {
+    if (isEditMode && cartItem?.customizations) {
+      return cartItem.customizations
+        .filter((c: any) => c.type === 'topping')
+        .map((c: any) => c.id);
+    }
+    return [];
+  });
+  const [selectedSides, setSelectedSides] = useState<string[]>(() => {
+    if (isEditMode && cartItem?.customizations) {
+      return cartItem.customizations
+        .filter((c: any) => c.type === 'side')
+        .map((c: any) => c.id);
+    }
+    return [];
+  });
 
   if (!itemData) {
     return (
@@ -105,13 +122,25 @@ const ItemDetails = () => {
       })
     ];
 
-    addItem({
-      id: itemData.$id,
-      name: itemData.name,
-      price: calculateTotalPrice(),
-      image_url: itemData.image_url,
-      customizations
-    });
+    if (isEditMode && cartItem) {
+      // Update the existing item
+      updateItem(cartItem.id, cartItem.customizations || [], {
+        id: itemData.$id,
+        name: itemData.name,
+        price: calculateTotalPrice(),
+        image_url: itemData.image_url,
+        customizations
+      });
+    } else {
+      // Add new item
+      addItem({
+        id: itemData.$id,
+        name: itemData.name,
+        price: calculateTotalPrice(),
+        image_url: itemData.image_url,
+        customizations
+      });
+    }
     
     router.back();
   };
@@ -270,7 +299,9 @@ const ItemDetails = () => {
           onPress={handleAddToCart}
           className="bg-orange-500 rounded-lg py-4 items-center"
         >
-          <Text className="text-white font-semibold text-lg">Add to Cart</Text>
+          <Text className="text-white font-semibold text-lg">
+            {isEditMode ? 'Update Item' : 'Add to Cart'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

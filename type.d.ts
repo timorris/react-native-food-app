@@ -44,6 +44,7 @@ export interface CartStore {
     removeItem: (id: string, customizations: CartCustomization[]) => void;
     increaseQty: (id: string, customizations: CartCustomization[]) => void;
     decreaseQty: (id: string, customizations: CartCustomization[]) => void;
+    updateItem: (oldId: string, oldCustomizations: CartCustomization[], newItem: Omit<CartItemType, "quantity">) => void;
     clearCart: () => void;
     getTotalItems: () => number;
     getTotalPrice: () => number;

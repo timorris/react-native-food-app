@@ -1,4 +1,4 @@
-import { CartCustomization, CartStore } from "@/type";
+import { CartCustomization, CartStore, CartItemType } from "@/type";
 import { create } from "zustand";
 
 function areCustomizationsEqual(
@@ -76,6 +76,25 @@ export const useCartStore = create<CartStore>((set, get) => ({
                         : i
                 )
                 .filter((i) => i.quantity > 0),
+        });
+    },
+
+    updateItem: (oldId: string, oldCustomizations: CartCustomization[], newItem: Omit<CartItemType, "quantity">) => {
+        const roundedPrice = Math.round(newItem.price * 100) / 100;
+        set({
+            items: get().items.map((i) =>
+                i.id === oldId &&
+                areCustomizationsEqual(i.customizations ?? [], oldCustomizations)
+                    ? { 
+                        id: newItem.id,
+                        name: newItem.name,
+                        price: roundedPrice,
+                        image_url: newItem.image_url,
+                        quantity: i.quantity,
+                        customizations: newItem.customizations
+                      }
+                    : i
+            ),
         });
     },
 
